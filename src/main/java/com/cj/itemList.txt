@@ -1,0 +1,17 @@
+{
+"item01":"道具1|../images/01.png",
+"item02":"道具2|../images/02.png",
+"item03":"道具3|../images/03.png",
+"item9001":"道具9001|../images/9001.png",
+"item1001":"道具1001|../images/1001.png",
+"item1002":"道具1002|../images/1002.png",
+"item1003":"道具1003|../images/1003.png",
+"item1007":"道具1007|../images/1003.png",
+"item2001":"道具2001|../images/2001.png",
+"item2002":"道具2002|../images/2002.png",
+"item2003":"道具2003|../images/2003.png",
+"item2004":"道具2004|../images/2004.png",
+"item2005":"道具2005|../images/2005.png",
+"item3001":"道具3001|../images/3001.png",
+"item1007":"道具1007|../images/1007.png",
+}

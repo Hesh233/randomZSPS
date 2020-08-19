@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/layui/lay/modules/jquery.js}"></script>
+<script th:src="@{/layui/lay/modules/layer.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all" />
+<head>
+<meta charset="utf-8" />
+<title>RamdonDemo</title>
+<meta name="renderer" content="webkit" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+</head>
+<body>
+<div class="layui-container">  
+
+  <div class="layui-row">
+  <div class="layui-col-md2" style="min-height:1px;">
+ 
+    </div>
+    <div class="layui-col-md8">
+<div class="layui-tab layui-tab-brief" lay-filter="TabBrief">
+  <ul class="layui-tab-title">
+	
+  </ul>
+  <div class="layui-tab-content"></div>
+</div>   
+    </div>
+    <div class="layui-col-md2">
+
+    </div>
+  </div>
+  </div>
+
+
+ 
+
+<script th:inline="javascript">
+//注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+layui.use('element', function(){
+  var element = layui.element;
+  var pool = [[${getPool}]];
+  var poolTimes = [[${poolTimes}]];
+  var length = 0;
+  console.log(pool);
+  for(var ever in pool) {
+      length++;
+  }  
+  
+  /*<![CDATA[*/
+  for (var i=0;i<length;i++) {
+	  k = i.toString();
+  	//console.log(pool[k]);
+    /*]]>*/    
+    if (pool[k].underTime != -1){
+    	var underRewardStr = "";
+    	var underNum = pool[k].underTime - poolTimes[pool[k].pool];
+    	underRewardStr = '<span style="position: absolute; top: 15px; left: 0;" id="under'+pool[i].pool+'">'+'剩余 '+underNum+' 次必出'+pool[k].underItemName+'</span>'    	
+    	console.log(underRewardStr);
+    }else{
+    	underRewardStr = "";
+    }
+  	element.tabAdd('TabBrief', {
+  	  title: pool[i].poolName
+  	  ,content: '<html>'
+  	+'<div style="position: relative; width: 100%; height: 300px;">'
+  	+'<img src="'+pool[i].imagePath+'" style="width:100%;height:400px"/>'
+  	+'<span style="position: absolute; top: 0; left: 0;">'+'剩余时间：'+pool[i].leftTime+'</span>'
+  	+ underRewardStr
+  	/*<![CDATA[*/
+  	+'<span style="font-size:15px;position: relative; bottom: 30px; left: 0px;" id="hasNum'+pool[i].pool+'">'+pool[i].cost+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 5%; left: 0px;width: 40px; height: 40px;"/>'+'x'+pool[i].costItemCount+'</span>'
+  	+'<span style="font-size:10px;position: absolute; top: 0px; left: 50%;">'+pool[i].mes+'</span>'
+  	//+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 40px; left: 0px;width: 40px; height: 40px;"/>'  	
+  	+'<i class="layui-icon layui-icon-about" onClick="UIClicked('+k+')" style="position: absolute; top: 0; right: 0%;font-size: 30px; color: #1E9FFF;"></i>'
+  	+'<i class="layui-icon layui-icon-refresh-3" onClick="History(\''+pool[i].pool+'\')" style="position: absolute; top: 11%; left: 0%;font-size: 25px; color: #d2d2d2;"></i>' 
+  	+'<i class="layui-icon layui-icon-refresh-3" onClick="exchangeHistory()" style="position: absolute; top: 21%; left: 0%;font-size: 25px; color: #1E9FFF;"></i>'  	
+  	+'<i class="layui-icon layui-icon-cart-simple" onClick="ExchangeClicked()" style="position: absolute; top: 10%; right: 0%;font-size: 30px; color: #1E9FFF;"></i>'
+  	+'<i class="layui-icon layui-icon-list" onClick="ownItem()" style="position: absolute; top: 31%; left: 0%;font-size: 25px; color: #1E9FFF;"></i>'  	
+  	+'<button type="button" onClick="BtnClicked(\''+pool[k].underTime+'\',\''+pool[i].pool+'\',\''+"1"+'\')" class="layui-btn layui-btn-lg layui-btn-normal" style="position: relative; bottom: 20%; left: 15%">一次</button>'
+  	+'<button type="button" onClick="BtnClicked(\''+pool[k].underTime+'\',\''+pool[i].pool+'\',\''+"10"+'\')" class="layui-btn layui-btn-lg layui-btn-normal" style="position: relative; bottom: 20%; left: 25%">十连</button>'
+  	+'<button type="button" onClick="BtnClicked(\''+pool[k].underTime+'\',\''+pool[i].pool+'\',\''+"100"+'\')" class="layui-btn layui-btn-lg layui-btn-normal" style="position: relative; bottom: 20%; left: 35%">百连</button>'
+  	/*]]>*/ 
+  	+'</div>'
+  	+'</html>'
+  	  ,id: pool[i].poolName
+  	});  
+  	if(i==0){
+  		element.tabChange('TabBrief', pool[k].poolName);
+  	}	
+
+  }
+  //var list = layui.$('li');
+  //layui.$.map(list, function(item,idx) {
+  //console.log(item.getAttribute('lay-id'))
+  //});
+  
+  
+  //…
+});
+function BtnClicked(underTime,pool,count){
+	var data = pool+"|"+count;
+	layui.$.ajax({
+		url: "../card/allCardResult",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(data)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			//成功
+			console.log(typeof(responseJson));
+			if (responseJson["code"] == "0"){
+				var succData = responseJson.data;
+				var length = 0;
+				for(var ever in succData) {
+					length ++;
+				}
+				var outPutPrecentStr = "";
+				/*<![CDATA[*/
+				for (var i=0;i<length;i++) {
+					k = i.toString();
+					var exchangItemName;
+					var exchangItemName = "";
+					var exchangItemPath = "";
+					var resItemName = "";
+					var resItemPath = "";
+					var exchangItemCount = "";
+					var resItemCount = "";
+					var items = succData[k];
+					console.log(succData[k]);					
+					for (var item in items){
+						
+						if(item == "resItem"){
+							var resItem = items[item];
+							resItemName = resItem.split("|")[0];
+							resItemPath	= resItem.split("|")[1];
+							resItemCount = resItem.split("|")[2];
+						  	outPutPrecentStr += '<img src="'+resItemPath+'" style="width:50px;height:50px"/>'
+						  	+'<span>'+resItemName+'：'+resItemCount+'</span>'+'</br></br></br>';
+							}else{
+								var exItem = items["exchangItem"];
+								exchangItemName = exItem.split("||")[0];
+								exchangItemPath = exItem.split("||")[1];
+								exchangItemCount = exItem.split("||")[2];
+								//exchangItemName = item.exchangItem.split("||")[0];
+							  	outPutPrecentStr += '<img src="'+exchangItemPath+'" style="width:50px;height:50px"/>'
+							  	+'<span>'+'extra--'+exchangItemName+'：'+exchangItemCount+'</span>'+'</br></br></br>';
+							}
+						}
+					}
+				layer.open({
+					  type: 1, 
+					  content: outPutPrecentStr, //这里content是一个普通的String
+					  title:"结果",
+					  area: ['50%', '70%']
+					});
+				//成功请求后刷新值
+				var underText = layui.$("#under"+pool).text();
+				var underNum = underText.split(" ")[1] - count;
+				if (underNum <= 0){
+					underNum = underTime - (-underNum);
+				}
+				var itemName = underText.split("出")[1];
+				var outputText = "剩余 "+underNum+" 次必出"+itemName;
+				layui.$("#under"+pool).text(outputText);
+				var hasText = layui.$("#hasNum"+pool).text();
+				var hasNum = hasText.split("x")[1] - count;
+				var hasName = hasText.split("x")[0];
+				outputText = hasName+"x"+hasNum;
+				layui.$("#hasNum"+pool).text(outputText);
+				}else if(responseJson["code"] == "-1"){					
+					alert("请登录");
+	          		setTimeout(function(){
+	          			location.href="/cj/card/CardPage";
+	          		},1000);
+				}else{
+					//数量不足
+					alert(responseJson.data[-1]);
+				}
+				/*]]>*/ 
+			}
+			
+
+             //HideLoading();
+         
+	});
+}
+function History(pool){
+	layui.$.ajax({
+		url: "../card/poolResult",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(pool)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			var outStr = responseJson.data["0"];
+			layer.open({
+				  type: 1, 
+				  content: outStr, //这里content是一个普通的String
+				  title:"历史抽奖纪录",
+				  area: ['50%', '70%']
+				});
+			}
+		});
+}
+function ownItem(pool){
+	layui.$.ajax({
+		url: "../card/queryOwnItem",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(pool)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			var items = responseJson.data["0"];
+			var itemName;
+			var itemCount;
+			var outStr = "";
+			for (var item in items){
+				itemName = item;
+				itemCount = items[item];
+				outStr += item+" x "+itemCount+"<br></br>";
+			}
+			layer.open({
+				  type: 1, 
+				  content: outStr, //这里content是一个普通的String
+				  title:"拥有的物品",
+				  area: ['50%', '70%']
+				});
+			}
+		});
+}
+function exchangeHistory(pool){
+	layui.$.ajax({
+		url: "../card/exchangeHistory",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(pool)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			var outStr = responseJson.data["0"];
+			layer.open({
+				  type: 1, 
+				  content: outStr, //这里content是一个普通的String
+				  title:"历史兑换纪录",
+				  area: ['50%', '70%']
+				});
+			}
+		});
+}
+/*<![CDATA[*/
+function Exchange(itemToExchangName,itemToExchangCount){
+	var iconCode = 1;
+	var res = "";		
+	layui.$.ajax({
+		url: "../card/exchangeItem",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(itemToExchangName+"|"+itemToExchangCount)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			var outStr = responseJson.data;				
+			if (outStr == null){
+				res = "兑换成功";
+			}else{
+				res = outStr;
+				iconCode = 2;
+			}		
+			layer.alert(res, {icon: iconCode});
+			//layer.open({
+		//		  type: 2, 
+			//	  content: outStr, //这里content是一个普通的String
+		//		  title:"结果",
+	//			  area: ['50%', '70%']
+//				});
+			},
+		error: function(XMLHttpRequest, textStatus){
+			var resJs = XMLHttpRequest.responseJSON;
+			var outStr = resJs.message;
+			iconCode = 2;
+			res = outStr;
+			layer.alert(res, {icon: iconCode});
+		}
+			
+		});
+}
+/*]]>*/
+function ExchangeClicked(pool){
+	layui.$.ajax({
+		url: "../card/getExchange",
+		type:"POST",
+		dataType: "json",
+		data:{datas:JSON.stringify(pool)},
+		success: function(XMLHttpRequest, textStatus){
+			var responseJson = XMLHttpRequest;
+			var datas = responseJson.data;
+			var length = 0;
+			  for(var ever in datas) {
+			      length++;
+			  }
+			  var outStr = "";
+			  /*<![CDATA[*/
+			  for (var i=0;i<length;i++) {
+				  k = i.toString();
+				  var str = datas[k];
+				  var itemToExchang = str.split(";")[0];
+				  var needItem = str.split(";")[1];
+				  var itemToExchangName = itemToExchang.split("|")[0];
+				  var itemToExchangPath = itemToExchang.split("|")[1];
+				  var itemToExchangCount = itemToExchang.split("|")[2];
+				  var needItemName = needItem.split("|")[0];
+				  var needItemPath = needItem.split("|")[1];
+				  var needItemCount = needItem.split("|")[2];
+				  outStr += '<img src="'+itemToExchangPath+'" style="width:50px;height:50px"/>'
+				  +'<span>'+itemToExchangName+'x'+itemToExchangCount+'需要'+'</span>';
+				  outStr += '<img src="'+needItemPath+'" style="width:50px;height:50px"/>'
+				  +'<span>'+needItemName+'x'+needItemCount+'</span>'+'<bottom onClick="Exchange(\''+itemToExchangName+'\',\''+itemToExchangCount+'\')" class="layui-btn layui-btn-lg layui-btn-normal">兑换</bottom>'+'</br></br></br>';
+				  
+			  }
+			  /*]]>*/
+			layer.open({
+				  type: 1, 
+				  content: outStr, 
+				  title:"兑换详情",
+				  area: ['50%', '70%']
+				});
+			}
+		});
+}
+
+function UIClicked(num){
+		var pool = [[${getPool}]];
+		var precent = pool[num].precentRes;	
+		//console.log(precent);
+		var length = 0;
+		  for(var ever in precent) {
+		      length++;
+		  }
+		  //console.log(precent);
+		  var outPutPrecentStr = "";
+		  var imagePaths = [];
+		  var precents = [];
+		  var itemNames = [];
+		  /*<![CDATA[*/
+		  for (var i=0;i<length;i++) {			 
+			  k = i.toString();
+			  //console.log(precent[k]);
+			  var outPutStrs = (precent[k]).split("|");
+			  imagePaths.push(outPutStrs[1]);
+			  itemNames.push(outPutStrs[0]);
+			  precents.push(outPutStrs[2]);
+			  outPutPrecentStr += '<img src="'+outPutStrs[1]+'" style="width:50px;height:50px"/>'
+				  +'<span>'+outPutStrs[0]+'：'+outPutStrs[2]+'</span>'+'</br></br></br>';
+			 
+		  }
+		layer.open({
+		  type: 1, 
+		  content: '</br></br>'+outPutPrecentStr,
+		  title:"概率详情",
+		  area: ['50%', '70%']
+		});
+		 /*]]>*/
+	}
+</script>
+</body>
+</html>
