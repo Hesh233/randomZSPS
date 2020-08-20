@@ -50,13 +50,13 @@ public class MainController{
 			return "user/loginPage";
 		}
 		//拥有多少数量,物品与pool关系{pool|timest;timeed:Name|xx次，pool|timest;timeed：Name|xx次}
-		JSONObject pool = mainService.getPool(account);		
+		JSONObject pool = mainService.getPool(account);
 		JSONObject poolTimes = mainService.getPoolTimes(account);
 		model.addAttribute("getPool",pool);
 		model.addAttribute("poolTimes",poolTimes);
 //		System.out.println(pool);
 //		System.out.println(poolTimes);
-		//TODO图片路径 
+		//TODO图片路径
 		return "card/CardPage";
 		}
 	@ResponseBody
@@ -75,7 +75,7 @@ public class MainController{
 		if (session.getAttribute("account") == null) {
 			return new JsonResult(ResultCode.NEED_LOGIN, "请登录");
 		}
-		JSONObject res = mainService.getExchange();		
+		JSONObject res = mainService.getExchange();
 		return new JsonResult(ResultCode.SUCCESS,"",res);
 	}
 	@ResponseBody
@@ -87,7 +87,7 @@ public class MainController{
 		String account = session.getAttribute("account").toString();
 		String pool = datas.replace("\"", "");
 		JSONObject res = mainService.getPoolHis(pool,account);
-		
+
 		return new JsonResult(ResultCode.SUCCESS,"", res);
 	}
 	@ResponseBody
@@ -97,9 +97,9 @@ public class MainController{
 			return new JsonResult(ResultCode.NEED_LOGIN, "请登录");
 		}
 		String account = session.getAttribute("account").toString();
-		JSONObject res = mainService.exchangeHistory(account);		
+		JSONObject res = mainService.exchangeHistory(account);
 		return new JsonResult(ResultCode.SUCCESS,"", res);
-	}	
+	}
 	@ResponseBody
 	@PostMapping("/exchangeItem")
 	public JsonResult exchangeItem(HttpSession session, Model model,@RequestParam("datas")String datas) {
@@ -108,12 +108,12 @@ public class MainController{
 		}
 		String account = session.getAttribute("account").toString();
 		datas = datas.replace("\"", "");
-		JSONObject res = mainService.exchangeItem(datas,account);		
+		JSONObject res = mainService.exchangeItem(datas,account);
 		return new JsonResult(ResultCode.SUCCESS,"", res);
-	}	
+	}
 	@RequestMapping("/LoginPage")
 	public String login_page(HttpSession session, Model model) {
-		
+
 		return "user/LoginPage";
 		}
 	@ResponseBody
@@ -147,12 +147,21 @@ public class MainController{
 	}
 	@ResponseBody
 	@PostMapping("/quitLogin")
-	public JsonResult login_handle(HttpSession session, Model model) {
+	public JsonResult quitLogin(HttpSession session, Model model) {
 		session.setAttribute("account",null);
 		session.setAttribute("accountName",null);
 		return new JsonResult(ResultCode.SUCCESS,"", "");
 	}
-	public String loginCheck(HttpSession session, Model model) {
-		return null;
-	}
+    @ResponseBody
+    @PostMapping("/underTime")
+    public JsonResult checkUnderTime(HttpSession session, Model model,@RequestParam("datas")String pool) {
+//        session.setAttribute("account",null);
+        Integer accountInt = (Integer)session.getAttribute("account");
+        if (accountInt == null) {
+            return new JsonResult(ResultCode.NEED_LOGIN, "请登录");
+        }
+        JSONObject res = mainService.getUnderTime(accountInt.toString(),pool);
+        return new JsonResult(ResultCode.SUCCESS,"", res);
+    }
+
 }

@@ -243,6 +243,14 @@ public class MainServiceImpl implements MainService {
 					JSONObject resultJs = new JSONObject();
 					hasTimeJs.put(poolName, 0);
 					hasJs.put("baodi",hasTimeJs.toJSONString());
+					itemName = poolJson.getString("baodi").split("\\|")[0];
+					String itemCount = (String) hasJs.get(itemName);
+					//8-20更正保底部分
+					if (itemCount != null) {
+						hasJs.put(itemName,Integer.parseInt(itemCount)+1);
+					}else {
+						hasJs.put(itemName,1);
+					}
 					resJs.put(userAccount,hasJs);
 					editFile(resJs.toJSONString(),userItemPath);
 					itemName = itemJs.getString(poolJson.getString("baodi").split("\\|")[0]).split("\\|")[0];
@@ -646,5 +654,20 @@ public class MainServiceImpl implements MainService {
 		resultJs.put("0",resJs);
 		return resultJs;
 	}
-	
+	@Override
+	public JSONObject getUnderTime(String account,String pool){
+		String userItemPath = "userItem.txt";
+		String poolPath = "mapConfig.txt";
+		JSONObject  userItemJs = JSONObject.parseObject(getText(userItemPath));
+		JSONObject  poolJsons = JSONObject.parseObject(getText("mapConfig.txt"));
+		JSONArray poolArray = (JSONArray)poolJsons.get(pool);
+		JSONObject userJs = userItemJs.getJSONObject(account).getJSONObject("baodi");
+		Integer hasCount = userJs.getInteger(pool);
+		JSONObject poolJs = poolArray.getJSONObject(0);
+		Integer uniderTimeNum = poolJs.getInteger("baodiTime");
+		JSONObject resJs = new JSONObject();
+		Integer resCount = uniderTimeNum-hasCount;
+		resJs.put("res",resCount.toString());
+	return  resJs;
+	}
 }

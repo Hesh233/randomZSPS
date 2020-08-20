@@ -63,13 +63,13 @@ layui.use('element', function(){
   	  title: pool[i].poolName
   	  ,content: '<html>'
   	+'<div style="position: relative; width: 100%; height: 300px;">'
-  	+'<img src="'+pool[i].imagePath+'" style="width:100%;height:400px"/>'
+  	+'<img src="'+pool[i].imagePath+'" style="width:650px;height:400px"/>'
   	+'<span style="position: absolute; top: 0; left: 0;">'+'剩余时间：'+pool[i].leftTime+'</span>'
   	+ underRewardStr
   	/*<![CDATA[*/
   	+'<span style="font-size:15px;position: relative; bottom: 30px; left: 0px;" id="hasNum'+pool[i].pool+'">'+pool[i].cost+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 5%; left: 0px;width: 40px; height: 40px;"/>'+'x'+pool[i].costItemCount+'</span>'
   	+'<span style="font-size:10px;position: absolute; top: 0px; left: 50%;">'+pool[i].mes+'</span>'
-  	//+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 40px; left: 0px;width: 40px; height: 40px;"/>'  	
+  	//+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 40px; left: 0px;width: 40px; height: 40px;"/>'
   	+'<i class="layui-icon layui-icon-about" onClick="UIClicked('+k+')" style="position: absolute; top: 0; right: 0%;font-size: 30px; color: #1E9FFF;"></i>'
   	+'<i class="layui-icon layui-icon-refresh-3" onClick="History(\''+pool[i].pool+'\')" style="position: absolute; top: 11%; left: 0%;font-size: 25px; color: #d2d2d2;"></i>' 
   	+'<i class="layui-icon layui-icon-refresh-3" onClick="exchangeHistory()" style="position: absolute; top: 21%; left: 0%;font-size: 25px; color: #1E9FFF;"></i>'  	
@@ -153,19 +153,33 @@ function BtnClicked(underTime,pool,count){
 					  area: ['50%', '70%']
 					});
 				//成功请求后刷新值
-				var underText = layui.$("#under"+pool).text();
-				var underNum = underText.split(" ")[1] - count;
-				if (underNum <= 0){
-					underNum = underTime - (-underNum);
-				}
-				var itemName = underText.split("出")[1];
-				var outputText = "剩余 "+underNum+" 次必出"+itemName;
-				layui.$("#under"+pool).text(outputText);
-				var hasText = layui.$("#hasNum"+pool).text();
-				var hasNum = hasText.split("x")[1] - count;
-				var hasName = hasText.split("x")[0];
-				outputText = hasName+"x"+hasNum;
-				layui.$("#hasNum"+pool).text(outputText);
+                //TODO同步保底次数
+                        var outStr = "";
+                		layui.$.ajax({
+                			url: "../card/underTime",
+                			type:"POST",
+                			dataType: "json",
+                			data:{datas:pool},
+                            success: function(XMLHttpRequestIn, textStatusIn){
+                                var responseJsonIn = XMLHttpRequestIn;
+                                outStr = responseJsonIn.data["res"];
+                            var underText = layui.$("#under"+pool).text();
+                            // var underNum = underText.split(" ")[1] - count;
+                            // if (underNum <= 0){
+                            // underNum = underTime - (-underNum);
+                            // }
+                            var itemName = underText.split("出")[1];
+                            var outputText = "剩余 "+outStr+" 次必出"+itemName;
+                            layui.$("#under"+pool).text(outputText);
+                            var hasText = layui.$("#hasNum"+pool).text();
+                            var hasNum = hasText.split("x")[1] - count;
+                            var hasName = hasText.split("x")[0];
+                            outputText = hasName+"x"+hasNum;
+                            layui.$("#hasNum"+pool).text(outputText);
+                			}
+                			});
+
+
 				}else if(responseJson["code"] == "-1"){					
 					alert("请登录");
 	          		setTimeout(function(){

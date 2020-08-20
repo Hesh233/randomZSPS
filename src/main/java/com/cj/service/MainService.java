@@ -33,7 +33,7 @@ public interface MainService {
 
 	JSONObject getQueryItem(String account);
 
-
+	JSONObject getUnderTime(String account,String pool);
 
 
 }
