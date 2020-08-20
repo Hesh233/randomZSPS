@@ -54,9 +54,6 @@ public class MainController{
 		JSONObject poolTimes = mainService.getPoolTimes(account);
 		model.addAttribute("getPool",pool);
 		model.addAttribute("poolTimes",poolTimes);
-//		System.out.println(pool);
-//		System.out.println(poolTimes);
-		//TODO图片路径
 		return "card/CardPage";
 		}
 	@ResponseBody

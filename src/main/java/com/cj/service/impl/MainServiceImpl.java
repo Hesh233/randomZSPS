@@ -169,8 +169,7 @@ public class MainServiceImpl implements MainService {
 
 	@Override
 	public JSONObject getCard(String poolName,String account) {
-		//读取配置文件		
-		//TODO登录账号判断（以后做）
+		//读取配置文件
 		JSONObject  poolJsons = JSONObject.parseObject(getText("mapConfig.txt"));		
 		JSONArray poolArray = (JSONArray)poolJsons.get(poolName);
 		JSONObject poolJson = poolArray.getJSONObject(0);
@@ -192,7 +191,6 @@ public class MainServiceImpl implements MainService {
 		String itemName = "";
 		String itemImgPath = "";		
 		if(now.before(dateEd) && now.after(dateSt)) {
-			//TODO 正确执行
 			//次数
 			//isDuiHuan
 			String resExchangeString = "";
@@ -439,7 +437,6 @@ public class MainServiceImpl implements MainService {
 //		String itemName = "";
 		String itemCountStr = "";
 		JSONObject poorJs = new JSONObject();
-		//TODO格式转成jsonobject
 		for (Map.Entry<String,Object> map : mapRes.entrySet()) {
 			poorJs = (JSONObject)map.getValue();
 			JSONObject userJs = new JSONObject();
@@ -451,7 +448,6 @@ public class MainServiceImpl implements MainService {
 		}
 		return mapRes;
 	}
-	//TODO关联账号
 	@Override
 	public JSONObject getPoolTimes(Integer account) {
 		String hasPath = "userItem.txt";
@@ -500,7 +496,7 @@ public class MainServiceImpl implements MainService {
 		return ""+day+"天"+hour+"小时";	
 	//	return ""+day+"天"+hour+"小时"+min+"分"+s+"秒";	
 	}
-//TODO兑换拆分类
+//兑换拆分类
 	@Override
 	public JSONObject getExchange() {
 		String exchangItemStr = getText("exchangeList.txt");
@@ -567,7 +563,6 @@ public class MainServiceImpl implements MainService {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");		
 		Date dateNow = new Date();
 		String dateStr = sdf.format(dateNow);
-		//TODO 兑换后数量还没有加上去
 		if (hasInt > needSum) {
 			tempJs.put(needToCostItem,String.valueOf(hasInt-needSum));
 			hasItemJs.put(account,tempJs);
@@ -647,7 +642,7 @@ public class MainServiceImpl implements MainService {
 		for (Map.Entry<String,Object> oneHasMap : hasMap.entrySet()) {
 			for (Map.Entry<String,Object> oneItemMap : itemMap.entrySet()) {
 				if(oneItemMap.getKey() == oneHasMap.getKey()) {
-					resJs.put(((String) oneItemMap.getValue()).split("\\|")[0], oneHasMap.getValue());
+					resJs.put(((String) oneItemMap.getValue()), oneHasMap.getValue());
 				}
 			}
 		}
@@ -659,7 +654,7 @@ public class MainServiceImpl implements MainService {
 		String userItemPath = "userItem.txt";
 		String poolPath = "mapConfig.txt";
 		JSONObject  userItemJs = JSONObject.parseObject(getText(userItemPath));
-		JSONObject  poolJsons = JSONObject.parseObject(getText("mapConfig.txt"));
+		JSONObject  poolJsons = JSONObject.parseObject(getText(poolPath));
 		JSONArray poolArray = (JSONArray)poolJsons.get(pool);
 		JSONObject userJs = userItemJs.getJSONObject(account).getJSONObject("baodi");
 		Integer hasCount = userJs.getInteger(pool);
