@@ -230,7 +230,7 @@ public class MainServiceImpl implements MainService {
 				resExchangeString = getResult(exchangeMap,allprecent);
 			}
 
-			if(poolJson.getString("isBaoDi").equals("True")){				
+			if(poolJson.getString("isBaoDi").equals("True")){
 				int lastTime = Integer.parseInt(poolJson.getString("baodiTime"));
 				//获取已抽次数
 				String  hasTimes = hasJs.getString("baodi");
@@ -242,18 +242,39 @@ public class MainServiceImpl implements MainService {
 					hasTimeJs.put(poolName, 0);
 					hasJs.put("baodi",hasTimeJs.toJSONString());
 					itemName = poolJson.getString("baodi").split("\\|")[0];
+					String itemRewCount = poolJson.getString("baodi").split("\\|")[1];
 					String itemCount = (String) hasJs.get(itemName);
 					//8-20更正保底部分
 					if (itemCount != null) {
-						hasJs.put(itemName,Integer.parseInt(itemCount)+1);
+						Integer resInt = Integer.parseInt(itemCount)+1;
+						hasJs.put(itemName,resInt.toString());
 					}else {
-						hasJs.put(itemName,1);
+						hasJs.put(itemName,itemRewCount);
 					}
+
+					//8-24兑换部分数量叠加
+					itemName = resExchangeString.split("\\|")[0];
+					itemRewCount = resExchangeString.split("\\|")[1];;
+					String duiHuanCount = itemCount = (String) hasJs.get(itemName);;
+					if (duiHuanCount != null) {
+						Integer resInt = Integer.parseInt(itemCount)+Integer.parseInt(itemRewCount);
+						hasJs.put(itemName,resInt.toString());
+					}else {
+						hasJs.put(itemName,itemRewCount);
+					}
+
 					resJs.put(userAccount,hasJs);
 					editFile(resJs.toJSONString(),userItemPath);
 					itemName = itemJs.getString(poolJson.getString("baodi").split("\\|")[0]).split("\\|")[0];
 					itemImgPath = itemJs.getString(poolJson.getString("baodi").split("\\|")[0]).split("\\|")[1]; 
 					resultJs.put("resItem",itemName+"|"+itemImgPath+"|"+poolJson.getString("baodi").split("\\|")[1]);
+
+					itemName = itemJs.getString(resExchangeString.split("\\|")[0]).split("\\|")[0];
+					itemImgPath = itemJs.getString(resExchangeString.split("\\|")[0]).split("\\|")[1];
+					resultJs.put("exchangItem",itemName+"||"+itemImgPath+"||"+resExchangeString.split("\\|")[1]);
+
+
+
 					return resultJs;
 				}else {
 //					userItemText.replaceAll(poolName+":\"(.*?)\"", Integer.toString(hasTime+1));
@@ -623,11 +644,10 @@ public class MainServiceImpl implements MainService {
 	@Override
 	public JSONObject getQueryItem(String account) {
 		String itemPath = "itemList.txt";
-		String hasPath = "userItem.txt";		
-//		String userAccount = "";
+		String hasPath = "userItem.txt";
 		JSONObject  hasItemJs = new JSONObject();
 //		JSONObject resJs = JSON.parseObject(getText(hasPath));
-		LinkedHashMap<String, Object> jsonMap = JSON.parseObject(getText(hasPath), new TypeReference<LinkedHashMap<String, Object>>() {});	
+		LinkedHashMap<String, Object> jsonMap = JSON.parseObject(getText(hasPath), new TypeReference<LinkedHashMap<String, Object>>() {});
 		for (Map.Entry<String,Object> map : jsonMap.entrySet()) {
 			Integer intKey = Integer.parseInt(map.getKey());
 			if(intKey.toString().equals(account)) {
@@ -635,9 +655,9 @@ public class MainServiceImpl implements MainService {
 				hasItemJs = (JSONObject)map.getValue();
 			}
 		}
-		LinkedHashMap<String, Object> hasMap = JSON.parseObject(hasItemJs.toJSONString(), new TypeReference<LinkedHashMap<String, Object>>() {});
+		LinkedHashMap<String, Object> hasMap = JSON.parseObject(hasItemJs.toString(), new TypeReference<LinkedHashMap<String, Object>>() {});
 		LinkedHashMap<String, Object> itemMap = JSON.parseObject(getText(itemPath), new TypeReference<LinkedHashMap<String, Object>>() {});
-		JSONObject resJs = new JSONObject();
+		LinkedHashMap<String, Object> resJs = new LinkedHashMap();
 		JSONObject resultJs = new JSONObject();
 		for (Map.Entry<String,Object> oneHasMap : hasMap.entrySet()) {
 			for (Map.Entry<String,Object> oneItemMap : itemMap.entrySet()) {
@@ -659,6 +679,9 @@ public class MainServiceImpl implements MainService {
 		JSONObject userJs = userItemJs.getJSONObject(account).getJSONObject("baodi");
 		Integer hasCount = userJs.getInteger(pool);
 		JSONObject poolJs = poolArray.getJSONObject(0);
+		if (poolJs.getString("isBaoDi").equals("False")){
+			return null;
+		}
 		Integer uniderTimeNum = poolJs.getInteger("baodiTime");
 		JSONObject resJs = new JSONObject();
 		Integer resCount = uniderTimeNum-hasCount;
