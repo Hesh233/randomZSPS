@@ -67,7 +67,7 @@ layui.use('element', function(){
   	+'<span style="position: absolute; top: 0; left: 20px;">'+'剩余时间：'+pool[i].leftTime+'</span>'
   	+ underRewardStr
   	/*<![CDATA[*/
-  	+'<span style="font-size:15px;position: relative; bottom: 45px; left: 20px;" id="hasNum'+pool[i].pool+'">'+pool[i].cost+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 5%; left: 0px;width: 40px; height: 40px;"/>'+'x'+pool[i].costItemCount+'</span>'
+  	+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 55px; left: 20px;width: 40px; height: 40px;"/>'+'<span style="font-size:15px;position: relative; bottom: 45px; left: 20px;" id="hasNum'+pool[i].pool+'">'+pool[i].cost+'x'+pool[i].costItemCount+'</span>'
   	+'<span style="font-size:10px;position: absolute; top: 0px; left: 50%;">'+pool[i].mes+'</span>'
   	//+'<img src="'+pool[i].costImg+'" style="position: relative; bottom: 40px; left: 0px;width: 40px; height: 40px;"/>'
   	+'<i class="layui-icon layui-icon-about" onClick="UIClicked('+k+')" style="position: absolute; top: 0; right: 20px;font-size: 30px; color: #1E9FFF;"></i>'
@@ -162,20 +162,23 @@ function BtnClicked(underTime,pool,count){
                 			data:{datas:pool},
                             success: function(XMLHttpRequestIn, textStatusIn){
                                 var responseJsonIn = XMLHttpRequestIn;
-                                outStr = responseJsonIn.data["res"];
-                            var underText = layui.$("#under"+pool).text();
-                            // var underNum = underText.split(" ")[1] - count;
-                            // if (underNum <= 0){
-                            // underNum = underTime - (-underNum);
-                            // }
-                            var itemName = underText.split("出")[1];
-                            var outputText = "剩余 "+outStr+" 次必出"+itemName;
-                            layui.$("#under"+pool).text(outputText);
-                            var hasText = layui.$("#hasNum"+pool).text();
-                            var hasNum = hasText.split("x")[1] - count;
-                            var hasName = hasText.split("x")[0];
-                            outputText = hasName+"x"+hasNum;
-                            layui.$("#hasNum"+pool).text(outputText);
+                                if(responseJsonIn.data != null){
+                                    outStr = responseJsonIn.data["res"];
+                                    var underText = layui.$("#under"+pool).text();
+                                    // var underNum = underText.split(" ")[1] - count;
+                                    // if (underNum <= 0){
+                                    // underNum = underTime - (-underNum);
+                                    // }
+                                    var itemName = underText.split("出")[1];
+                                    var outputText = "剩余 "+outStr+" 次必出"+itemName;
+                                    layui.$("#under"+pool).text(outputText);
+
+                                }
+                                var hasText = layui.$("#hasNum"+pool).text();
+                                var hasNum = hasText.split("x")[1] - count;
+                                var hasName = hasText.split("x")[0];
+                                outputText = hasName+"x"+hasNum;
+                                layui.$("#hasNum"+pool).text(outputText);
                 			}
                 			});
 

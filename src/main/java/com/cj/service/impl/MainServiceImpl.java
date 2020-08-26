@@ -34,6 +34,7 @@ import com.cj.util.ServerException;
 @Service("MainService")
 public class MainServiceImpl implements MainService {
 	@JSONField(jsonDirect=true)
+	//修改数据
 	public boolean editFile(String string,String path) {
 	   PrintStream stream=null;
 	    try {
@@ -46,6 +47,7 @@ public class MainServiceImpl implements MainService {
 	    }
 	    return false;
 	}
+	//添加数据
 	public static void addFile(String conent, String file) {
 		BufferedWriter out = null;
 		try {
@@ -62,7 +64,7 @@ public class MainServiceImpl implements MainService {
 		}
 		}
 	}
-	//param2-不换行
+	//获取数据
 	public String getText(String path) {
 		InputStreamReader reader;
 //		  InputStream stream = this.getClass().getResourceAsStream(path);
@@ -85,7 +87,8 @@ public class MainServiceImpl implements MainService {
 			return null;
 		}			
 		return lines;
-	} 
+	}
+	//获取历史记录
 	public String getAndChangItemText(String path,String tex,String account) {
 		JSONObject  itemJs = JSONObject.parseObject(getText("itemList.txt"));		
 		InputStreamReader reader;
@@ -123,14 +126,14 @@ public class MainServiceImpl implements MainService {
 			return null;
 		}			
 		return lines;
-	} 	
+	}
+	//抽卡主方法
 	@Override
 	public JSONObject allCardResult(int num,String pool,String account) {
 		String costPath = "costItem.txt";
 		String hasPath = "userItem.txt";
 		String costItemStr = getText(costPath);
 		JSONObject  costJs = JSONObject.parseObject(costItemStr);
-		
 		String costItems =  (String) costJs.get(pool);
 		String costName = costItems.split("\\|")[1];
 		String costItem = costItems.split("\\|")[0];		
@@ -166,7 +169,7 @@ public class MainServiceImpl implements MainService {
 		
 		return jo;
 	}
-
+	//单次抽取方法
 	@Override
 	public JSONObject getCard(String poolName,String account) {
 		//读取配置文件
@@ -272,9 +275,6 @@ public class MainServiceImpl implements MainService {
 					itemName = itemJs.getString(resExchangeString.split("\\|")[0]).split("\\|")[0];
 					itemImgPath = itemJs.getString(resExchangeString.split("\\|")[0]).split("\\|")[1];
 					resultJs.put("exchangItem",itemName+"||"+itemImgPath+"||"+resExchangeString.split("\\|")[1]);
-
-
-
 					return resultJs;
 				}else {
 //					userItemText.replaceAll(poolName+":\"(.*?)\"", Integer.toString(hasTime+1));
@@ -356,21 +356,7 @@ public class MainServiceImpl implements MainService {
 //			return resJs;
 		}
 	}
-	@Override
-	public String getCount() {
-		String hasPath = "userItem.txt";
-		String costPath = "itemCost.txt";
-		JSONObject  costItemJs = JSONObject.parseObject(getText(costPath));
-		JSONObject  hasItemJs = JSONObject.parseObject(getText(hasPath));
-		return hasItemJs.toJSONString()+costItemJs.toJSONString();		
-	}
-	public String getHasCount() {
-		String hasPath = "userItem.txt";
-		String costPath = "itemCost.txt";
-		JSONObject  costItemJs = JSONObject.parseObject(getText(costPath));
-		JSONObject  hasItemJs = JSONObject.parseObject(getText(hasPath));
-		return hasItemJs.toJSONString()+costItemJs.toJSONString();		
-	}
+
 	@Override
 	public JSONObject getPool(Integer account) {
 		String poolPath = "mapConfig.txt";
